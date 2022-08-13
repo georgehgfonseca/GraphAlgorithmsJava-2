@@ -44,6 +44,28 @@ public class Graph {
     return highest;
   }
 
+  public int lowestDegree() {
+    int lowest = this.countNodes;
+    for (int i = 0; i < this.adjMatrix.length; ++i) {
+      int degreeNodeI = this.degree(i);
+      if (lowest > degreeNodeI)
+        lowest = degreeNodeI;
+    }
+    return lowest;
+  }
+
+  public Graph complement() {
+    Graph g2 = new Graph(this.countNodes);
+    for (int i = 0; i < this.adjMatrix.length; ++i) {
+      for (int j = 0; j < this.adjMatrix[i].length; ++j) {
+        if (i != j && this.adjMatrix[i][j] == 0) {
+          g2.addEdge(i, j, 1);
+        }
+      }
+    }
+    return g2;
+  }
+
   public String toString() {
     String str = "";
     for (int i = 0; i < this.adjMatrix.length; ++i) {
