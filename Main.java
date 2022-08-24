@@ -6,7 +6,6 @@ class Main {
     g1.addEdge(1, 0, 1);
     g1.addEdge(0, 3, 1);
     g1.addEdge(3, 0, 1);
-    g1.addEdge(0, 4, 1); // Warning
     System.out.println(g1);
     g1.degree(0); // 2
     g1.degree(1); // 1
@@ -15,5 +14,6 @@ class Main {
     System.out.println(g1.highestDegree()); // 2
     System.out.println(g1.lowestDegree()); // 0
     System.out.println(g1.complement());
+    System.out.println(g1.oriented());
   }
 }

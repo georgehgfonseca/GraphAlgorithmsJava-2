@@ -66,6 +66,20 @@ public class Graph {
     return g2;
   }
 
+  public float density() {
+    return (float) this.countEdges / (this.countNodes * (this.countNodes - 1));
+  }
+
+  public boolean oriented() {
+    for (int i = 0; i < this.adjMatrix.length; ++i) {
+      for (int j = 0; j < this.adjMatrix[i].length; ++j) {
+        if (this.adjMatrix[i][j] != this.adjMatrix[j][i])
+          return true;
+      }
+    }
+    return false;
+  }
+
   public String toString() {
     String str = "";
     for (int i = 0; i < this.adjMatrix.length; ++i) {
