@@ -1,3 +1,5 @@
+import java.util.ArrayList;
+
 public class Graph {
 
   private int countNodes;
@@ -19,6 +21,18 @@ public class Graph {
     }
     this.countEdges++;
     this.adjMatrix[source][sink] = weight;
+  }
+
+  public void addEdgeUnoriented(int source, int sink, int weight) {
+    if (source < 0 || source > this.adjMatrix.length - 1 ||
+        sink < 0 || sink > this.adjMatrix.length - 1 ||
+        weight <= 0) {
+      System.err.printf("Invalid edge: %d %d %d\n", source, sink, weight);
+      return;
+    }
+    this.countEdges += 2;
+    this.adjMatrix[source][sink] = weight;
+    this.adjMatrix[sink][source] = weight;
   }
 
   public int degree(int node) {
@@ -80,6 +94,34 @@ public class Graph {
     return false;
   }
 
+  public ArrayList<Integer> bfs(int s) { // busca em largura
+    // initialization
+    int[] desc = new int[this.countNodes];
+    ArrayList<Integer> Q = new ArrayList<>();
+    Q.add(s);
+    ArrayList<Integer> R = new ArrayList<>();
+    R.add(s);
+    desc[s] = 1;
+    // main loop
+    while (Q.size() > 0) {
+      int u = Q.remove(0);
+      for (int v = 0; v < this.adjMatrix[u].length; ++v) {
+        if (this.adjMatrix[u][v] != 0) { // v é adjacente a u
+          if (desc[v] == 0) {
+            Q.add(v);
+            R.add(v);
+            desc[v] = 1;
+          }
+        }
+      }
+    }
+    return R;
+  }
+
+  public boolean connected() {
+    return this.bfs(0).size() == this.countNodes;
+  }
+  
   public String toString() {
     String str = "";
     for (int i = 0; i < this.adjMatrix.length; ++i) {
