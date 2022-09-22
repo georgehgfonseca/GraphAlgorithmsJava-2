@@ -1,4 +1,8 @@
 import java.util.ArrayList;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
 
 public class Graph {
 
@@ -10,6 +14,29 @@ public class Graph {
     this.countNodes = numNodes;
     this.countEdges = 0;
     this.adjMatrix = new int[numNodes][numNodes];
+  }
+
+  public Graph(String fileName) throws IOException {
+    File file = new File(fileName);
+    FileReader reader = new FileReader(file);
+    BufferedReader bufferedReader = new BufferedReader(reader);
+
+    // Read header
+    String[] line = bufferedReader.readLine().split(" ");
+    this.countNodes = (Integer.parseInt(line[0]));
+    int fileLines = (Integer.parseInt(line[1]));
+
+    // Create and fill adjMatrix with read edges
+    this.adjMatrix = new int[this.countNodes][this.countNodes];
+    for (int i = 0; i < fileLines; ++i) {
+      String[] edgeInfo = bufferedReader.readLine().split(" ");
+      int source = Integer.parseInt(edgeInfo[0]);
+      int sink = Integer.parseInt(edgeInfo[1]);
+      int weight = Integer.parseInt(edgeInfo[2]);
+      addEdge(source, sink, weight);
+    }
+    bufferedReader.close();
+    reader.close();
   }
 
   public void addEdge(int source, int sink, int weight) {
@@ -141,15 +168,13 @@ public class Graph {
       if (v != -1) {
         S.add(v);
         R.add(v);
-        desc[v] = 1;
-      }
-      else {
+      } else {
         S.remove(S.size() - 1);
       }
     }
     return R;
   }
-  
+
   public boolean connected() {
     return this.bfs(0).size() == this.countNodes;
   }
@@ -170,7 +195,73 @@ public class Graph {
       }
     }
   }
-  
+
+  public ArrayList<Integer> topSort() {
+    int[] desc = new int[this.countNodes];
+    ArrayList<Integer> R = new ArrayList<>();
+    for (int v = 0; v < this.adjMatrix.length; ++v) {
+      if (desc[v] == 0)
+        topSortAux(v, desc, R);
+    }
+    return R;
+  }
+
+  public void topSortAux(int u, int[] desc, ArrayList<Integer> R) {
+    desc[u] = 1;
+    for (int v = 0; v < this.adjMatrix[u].length; ++v) {
+      if (this.adjMatrix[u][v] != 0 && desc[v] == 0)
+        topSortAux(v, desc, R);
+    }
+    R.add(0, u);
+  }
+
+  public int[] connectedComp() {
+    int[] desc = new int[this.countNodes];
+    int comp = 0;
+    for (int v = 0; v < this.adjMatrix.length; ++v) {
+      if (desc[v] == 0) {
+        comp += 1;
+        connectedCompAux(v, desc, comp);
+      }
+    }
+    return desc;
+  }
+
+  public void connectedCompAux(int u, int[] desc, int comp) {
+    desc[u] = comp;
+    for (int v = 0; v < this.adjMatrix[u].length; ++v) {
+      if (this.adjMatrix[u][v] != 0 && desc[v] == 0)
+        connectedCompAux(v, desc, comp);
+    }
+  }
+
+  public boolean hasCycleOriented() {
+    // based on bfs
+    int[] desc = new int[this.countNodes];
+    for (int s = 0; s < this.countNodes; ++s) {
+      if (desc[s] == 0) {
+        ArrayList<Integer> Q = new ArrayList<>();
+        Q.add(s);
+        desc[s] = 1;
+        while (Q.size() > 0) {
+          int u = Q.remove(0);
+          for (int v = 0; v < this.adjMatrix[u].length; ++v) {
+            if (this.adjMatrix[u][v] != 0) { 
+              if (desc[v] == 0) {
+                Q.add(v);
+                desc[v] = 1;
+              }
+              else {
+                return true;
+              }
+            }
+          }
+        }
+      }
+    }
+    return false;
+  }
+
   public String toString() {
     String str = "";
     for (int i = 0; i < this.adjMatrix.length; ++i) {
